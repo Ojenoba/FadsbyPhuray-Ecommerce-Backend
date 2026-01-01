@@ -1,0 +1,10 @@
+node_modules/
+.env
+dist/
+coverage/
+seed.js
+.dockerignore
+MONGODB_SETUP.md
+DEPLOYMENT.md
+Dockerfile
+.idea/
