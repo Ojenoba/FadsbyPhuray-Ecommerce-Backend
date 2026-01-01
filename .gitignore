@@ -8,3 +8,4 @@ MONGODB_SETUP.md
 DEPLOYMENT.md
 Dockerfile
 .idea/
+seedAdmin.js
