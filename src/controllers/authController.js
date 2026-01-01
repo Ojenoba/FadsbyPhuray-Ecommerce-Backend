@@ -1,7 +1,10 @@
+// src/controllers/authController.js
 import jwt from "jsonwebtoken";
 import bcryptjs from "bcryptjs";
 import { User } from "../models/User.js";
 import { asyncHandler } from "../middleware/errorHandler.js";
+
+const isProd = process.env.NODE_ENV === "production";
 
 // Utility: generate JWT
 const generateToken = (user) => {
@@ -9,10 +12,21 @@ const generateToken = (user) => {
     throw new Error("JWT_SECRET must be defined in .env");
   }
   return jwt.sign(
-    { id: user._id, role: user.role }, // payload matches authMiddleware
+    { id: user._id, role: user.role },
     process.env.JWT_SECRET,
     { expiresIn: process.env.JWT_EXPIRE || "7d" }
   );
+};
+
+// Utility: set auth cookie
+const setAuthCookie = (res, token) => {
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: isProd,      // HTTPS required in production (Render uses HTTPS)
+    sameSite: "none",    // allow cross-site cookies (Netlify domain)
+    path: "/",
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  });
 };
 
 // 🔑 Admin login
@@ -30,10 +44,10 @@ export const adminLogin = asyncHandler(async (req, res) => {
   }
 
   const token = generateToken(admin);
+  setAuthCookie(res, token);
 
   res.status(200).json({
     success: true,
-    token,
     user: {
       id: admin._id,
       username: admin.username,
@@ -56,10 +70,10 @@ export const registerUser = asyncHandler(async (req, res) => {
   await user.save();
 
   const token = generateToken(user);
+  setAuthCookie(res, token);
 
   res.status(201).json({
     success: true,
-    token,
     user: {
       id: user._id,
       username: user.username,
@@ -84,10 +98,10 @@ export const loginUser = asyncHandler(async (req, res) => {
   }
 
   const token = generateToken(user);
+  setAuthCookie(res, token);
 
   res.status(200).json({
     success: true,
-    token,
     user: {
       id: user._id,
       username: user.username,
@@ -97,12 +111,32 @@ export const loginUser = asyncHandler(async (req, res) => {
   });
 });
 
-// src/controllers/authController.js
+// 🔓 Logout
 export const logoutUser = (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    secure: isProd,
+    sameSite: "none",
+    path: "/",
   });
   res.status(200).json({ success: true, message: "Logged out successfully" });
 };
+
+// src/controllers/authController.js (add this)
+export const getMe = asyncHandler(async (req, res) => {
+  const token = req.cookies?.token;
+  if (!token) {
+    return res.status(401).json({ success: false, error: "No token" });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id).select("-password");
+    if (!user) {
+      return res.status(401).json({ success: false, error: "User not found" });
+    }
+    res.status(200).json({ success: true, user });
+  } catch {
+    return res.status(401).json({ success: false, error: "Invalid token" });
+  }
+});

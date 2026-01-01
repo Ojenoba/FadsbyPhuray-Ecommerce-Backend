@@ -5,10 +5,10 @@ import {
   loginUser,
   logoutUser,
   adminLogin,
+  getMe, // 👈 new controller we added
 } from "../controllers/authController.js";
 import { validate } from "../middleware/validate.js";
 import { registerSchema, loginSchema } from "../validationSchemas.js";
-import { jwtVerify } from "jose";
 
 const router = express.Router();
 
@@ -37,22 +37,7 @@ router.post("/admin/login", loginLimiter, validate(loginSchema), adminLogin);
 // 🔑 Normal user logout
 router.post("/logout", logoutUser);
 
-// 🔑 Current user info (from JWT cookie)
-router.get("/me", async (req, res) => {
-  const token = req.cookies?.token;
-  if (!token) {
-    return res.status(401).json({ success: false, error: "Not logged in" });
-  }
-
-  try {
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-    const { payload } = await jwtVerify(token, secret);
-
-    // ✅ Return user payload from JWT
-    res.json({ success: true, user: payload });
-  } catch (err) {
-    res.status(401).json({ success: false, error: "Invalid or expired token" });
-  }
-});
+// 🔑 Current user info (reads JWT cookie, verifies, returns user)
+router.get("/me", getMe);
 
 export default router;
