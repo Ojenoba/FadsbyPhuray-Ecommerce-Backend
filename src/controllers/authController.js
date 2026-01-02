@@ -39,3 +39,21 @@ export const logoutUser = (req, res) => {
   clearAuthCookie(res);
   res.status(200).json({ success: true, message: "Logged out successfully" });
 };
+
+export const getMe = asyncHandler(async (req, res) => {
+  const token = req.cookies?.token;
+  if (!token) {
+    return res.status(401).json({ success: false, error: "No token" });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id).select("-password");
+    if (!user) {
+      return res.status(401).json({ success: false, error: "User not found" });
+    }
+    res.status(200).json({ success: true, user });
+  } catch {
+    return res.status(401).json({ success: false, error: "Invalid token" });
+  }
+});
