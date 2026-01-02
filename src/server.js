@@ -32,6 +32,8 @@ const corsOrigins = (process.env.FRONTEND_URL || "http://localhost:3000")
   .split(",")
   .map((url) => url.trim());
 
+  app.set("trust proxy", 1);
+
 // ✅ Allow multiple origins
 app.use(
   cors({
@@ -62,7 +64,7 @@ app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/payments", paymentRoutes);
-app.use("/api", announcementRoutes);
+app.use("/api/announcements", announcementRoutes);
 app.use("/api/categories", categoriesRouter);
 app.use("/api/admin", adminRoutes);
 
