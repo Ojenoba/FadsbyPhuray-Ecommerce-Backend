@@ -1,3 +1,4 @@
+import jwt from "jsonwebtoken";               // ✅ add this
 import { User } from "../models/User.js";
 import { asyncHandler } from "../middleware/errorHandler.js";
 import { generateToken } from "../utils/generateToken.js";
@@ -40,6 +41,7 @@ export const logoutUser = (req, res) => {
   res.status(200).json({ success: true, message: "Logged out successfully" });
 };
 
+// Current user info
 export const getMe = asyncHandler(async (req, res) => {
   const token = req.cookies?.token;
   if (!token) {
