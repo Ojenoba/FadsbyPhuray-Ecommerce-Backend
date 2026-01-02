@@ -28,6 +28,7 @@ export const adminLogin = asyncHandler(async (req, res) => {
     secure: process.env.NODE_ENV === "production", // only secure in prod
     sameSite: "none",
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    Path: "/",
   });
 
   // Return JSON for frontend context
@@ -48,6 +49,7 @@ export const logoutAdmin = (req, res) => {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "none",
+    path: "/", // clear cookie across all routes
   });
   res.status(200).json({ success: true, message: "Admin logged out successfully" });
 };
