@@ -24,10 +24,6 @@ import cartRoutes from "./routes/cartRoutes.js";
 import categoriesRouter from "./routes/categories.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
 
-// Debug check for env variables
-console.log("Public Key:", process.env.FLUTTERWAVE_PUBLIC_KEY);
-console.log("Secret Key:", process.env.FLUTTERWAVE_SECRET_KEY);
-
 const app = express();
 const PORT = process.env.PORT || 5000;
 
