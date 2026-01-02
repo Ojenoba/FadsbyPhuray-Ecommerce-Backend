@@ -1,7 +1,7 @@
 import bcryptjs from "bcryptjs";
 import { User } from "../models/User.js";
 import { asyncHandler } from "../middleware/errorHandler.js";
-import { generateToken } from "../utils/generateToken.js";
+import { generateToken } from "./authController.js";
 
 export const adminLogin = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
