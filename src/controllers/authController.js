@@ -1,4 +1,3 @@
-// src/controllers/authController.js
 import jwt from "jsonwebtoken";
 import bcryptjs from "bcryptjs";
 import { User } from "../models/User.js";
@@ -18,7 +17,7 @@ const generateToken = (user) => {
   );
 };
 
-// Utility: set auth cookie
+// Utility: set auth cookie (with Partitioned attribute)
 const setAuthCookie = (res, token) => {
   res.cookie("token", token, {
     httpOnly: true,
@@ -27,6 +26,12 @@ const setAuthCookie = (res, token) => {
     path: "/",          // ✅ ensure cookie applies site-wide
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   });
+
+  // ✅ Append Partitioned attribute manually
+  res.append(
+    "Set-Cookie",
+    `token=${token}; Path=/; HttpOnly; Secure; SameSite=None; Partitioned; Max-Age=${7 * 24 * 60 * 60}`
+  );
 };
 
 // 🔑 Admin login
@@ -119,6 +124,13 @@ export const logoutUser = (req, res) => {
     sameSite: "none",
     path: "/", // ✅ clear cookie site-wide
   });
+
+  // ✅ Append Partitioned clear
+  res.append(
+    "Set-Cookie",
+    "token=; Path=/; HttpOnly; Secure; SameSite=None; Partitioned; Max-Age=0"
+  );
+
   res.status(200).json({ success: true, message: "Logged out successfully" });
 };
 
