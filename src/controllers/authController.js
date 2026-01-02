@@ -6,7 +6,7 @@ import { asyncHandler } from "../middleware/errorHandler.js";
 const isProd = process.env.NODE_ENV === "production";
 
 // Utility: generate JWT
-const generateToken = (user) => {
+export const generateToken = (user) => {
   if (!process.env.JWT_SECRET) {
     throw new Error("JWT_SECRET must be defined in .env");
   }
