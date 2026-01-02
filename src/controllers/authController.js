@@ -22,9 +22,9 @@ const generateToken = (user) => {
 const setAuthCookie = (res, token) => {
   res.cookie("token", token, {
     httpOnly: true,
-    secure: isProd,      // HTTPS required in production (Render uses HTTPS)
-    sameSite: "none",    // allow cross-site cookies (Netlify domain)
-    path: "/",
+    secure: isProd,     // ✅ must be true in production
+    sameSite: "none",   // ✅ allow cross-site cookies (Netlify → Render)
+    path: "/",          // ✅ ensure cookie applies site-wide
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   });
 };
@@ -117,12 +117,12 @@ export const logoutUser = (req, res) => {
     httpOnly: true,
     secure: isProd,
     sameSite: "none",
-    path: "/",
+    path: "/", // ✅ clear cookie site-wide
   });
   res.status(200).json({ success: true, message: "Logged out successfully" });
 };
 
-// src/controllers/authController.js (add this)
+// 👤 Current user info
 export const getMe = asyncHandler(async (req, res) => {
   const token = req.cookies?.token;
   if (!token) {

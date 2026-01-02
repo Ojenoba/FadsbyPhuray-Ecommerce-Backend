@@ -2,6 +2,8 @@
 import { User } from "../models/User.js";
 import jwt from "jsonwebtoken";
 
+const isProd = process.env.NODE_ENV === "production";
+
 export const adminLogin = async (req, res) => {
   const { email, password } = req.body;
 
@@ -29,8 +31,9 @@ export const adminLogin = async (req, res) => {
     // ✅ Set cookie so /me can read it
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "none",
+      secure: isProd,       // must be true in production
+      sameSite: "none",     // allow cross-site cookies
+      path: "/",            // ensure cookie is valid for all routes
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
 
@@ -52,8 +55,9 @@ export const adminLogin = async (req, res) => {
 export const logoutAdmin = (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: isProd,
     sameSite: "none",
+    path: "/", // clear cookie across all routes
   });
   res.status(200).json({ success: true, message: "Admin logged out successfully" });
 };

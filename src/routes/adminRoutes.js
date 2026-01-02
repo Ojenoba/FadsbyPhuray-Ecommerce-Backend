@@ -1,3 +1,4 @@
+// src/routes/adminRoutes.js
 import express from "express";
 import rateLimit from "express-rate-limit";
 import { adminLogin, logoutAdmin } from "../controllers/adminController.js";
@@ -25,8 +26,7 @@ router.post("/login", loginLimiter, adminLogin);
 router.post("/logout", logoutAdmin);
 
 // 🔑 Current admin info (protected by middleware)
-router.get("/me", authMiddleware, adminMiddleware, async (req, res) => {
-  // ✅ req.user is already set by authMiddleware
+router.get("/me", authMiddleware, adminMiddleware, (req, res) => {
   res.json({
     success: true,
     user: {
