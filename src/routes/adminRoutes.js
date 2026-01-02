@@ -1,7 +1,6 @@
-// src/routes/adminRoutes.js
 import express from "express";
 import rateLimit from "express-rate-limit";
-import { adminLogin, logoutAdmin } from "../controllers/adminController.js";
+import { adminLogin, logoutAdmin, getAdminMe } from "../controllers/adminController.js";
 import { authMiddleware, adminMiddleware } from "../middleware/auth.js";
 
 const router = express.Router();
@@ -25,15 +24,7 @@ router.post("/login", loginLimiter, adminLogin);
 // 🔑 Admin logout
 router.post("/logout", logoutAdmin);
 
-// 🔑 Current admin info (protected by middleware)
-router.get("/me", authMiddleware, adminMiddleware, (req, res) => {
-  res.json({
-    success: true,
-    user: {
-      id: req.user.id,
-      role: req.user.role,
-    },
-  });
-});
+// 👤 Current admin info (protected by middleware)
+router.get("/me", authMiddleware, adminMiddleware, getAdminMe);
 
 export default router;
