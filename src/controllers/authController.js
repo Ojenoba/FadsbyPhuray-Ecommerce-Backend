@@ -50,13 +50,10 @@ export const getMe = asyncHandler(async (req, res) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log("✅ Decoded payload:", decoded);
 
     const user = await User.findById(decoded.id).select("-password");
-    console.log("🔎 DB lookup result:", user);
 
     if (!user) {
-      console.log("❌ User not found in DB");
       return res.status(401).json({ success: false, error: "User not found" });
     }
     res.status(200).json({ success: true, user });

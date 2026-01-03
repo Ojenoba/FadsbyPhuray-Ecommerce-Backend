@@ -25,13 +25,13 @@ const loginLimiter = rateLimit({
   },
 });
 
-// 🔑 Normal user signup
-router.post("/signup", validate(registerSchema), registerUser);
+// 🔑 User registration
+router.post("/register", validate(registerSchema), registerUser);
 
-// 🔑 Normal user login
+// 🔑 User login
 router.post("/login", loginLimiter, validate(loginSchema), loginUser);
 
-// 🔑 Normal user logout
+// 🔑 User logout
 router.post("/logout", logoutUser);
 
 // 🔑 Current user info

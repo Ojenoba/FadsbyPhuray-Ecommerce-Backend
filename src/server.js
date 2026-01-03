@@ -1,5 +1,4 @@
 // src/server.js
-
 import dotenv from "dotenv";
 dotenv.config({ path: "./.env" }); // load env first
 
@@ -32,7 +31,7 @@ const corsOrigins = (process.env.FRONTEND_URL || "http://localhost:3000")
   .split(",")
   .map((url) => url.trim());
 
-  app.set("trust proxy", 1);
+app.set("trust proxy", 1);
 
 // ✅ Allow multiple origins
 app.use(
@@ -58,6 +57,7 @@ app.get("/api/health", (req, res) => {
 
 // ✅ API Routes
 app.use("/api/auth", authRoutes);
+console.log("✅ Auth routes mounted at /api/auth");
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/wishlist", wishlistRoutes);
