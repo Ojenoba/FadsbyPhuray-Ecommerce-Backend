@@ -5,6 +5,7 @@ export const setAuthCookie = (res, token) => {
     sameSite: "lax", // Changed from "none" to "lax" for better security
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     path: "/", // Ensure cookie is available to all paths
+    domain: ".fadsbyphuray.com.ng", // ✅ Allow all subdomains to access this cookie
   });
 };
 
@@ -14,5 +15,6 @@ export const clearAuthCookie = (res) => {
     secure: true,
     sameSite: "lax",
     path: "/",
+    domain: ".fadsbyphuray.com.ng", // ✅ Match the domain used in setAuthCookie
   });
 };
