@@ -25,14 +25,23 @@ export const registerUser = asyncHandler(async (req, res) => {
 export const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email }).select("+password");
-  if (!user || !(await user.comparePassword(password))) {
+  
+  if (!user) {
+    console.warn(`❌ Login failed: User not found for email: ${email}`);
+    return res.status(401).json({ success: false, error: "Invalid credentials" });
+  }
+  
+  const isPasswordValid = await user.comparePassword(password);
+  if (!isPasswordValid) {
+    console.warn(`❌ Login failed: Invalid password for email: ${email}`);
     return res.status(401).json({ success: false, error: "Invalid credentials" });
   }
 
   const token = generateToken(user);
   setAuthCookie(res, token);
 
-  res.status(200).json({ success: true, user });
+  console.log(`✅ Login successful for: ${email}`);
+  res.status(200).json({ success: true, user: { id: user._id, username: user.username, email: user.email, role: user.role } });
 });
 
 // Logout

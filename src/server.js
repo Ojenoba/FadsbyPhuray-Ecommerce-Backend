@@ -31,15 +31,27 @@ const corsOrigins = (process.env.FRONTEND_URL || "http://localhost:3000")
   .split(",")
   .map((url) => url.trim());
 
+console.log("🔒 CORS Origins:", corsOrigins); // Debug logging
+console.log("🔒 NODE_ENV:", process.env.NODE_ENV);
+
 app.set("trust proxy", 1);
 
 // ✅ Allow multiple origins
 app.use(
   cors({
-    origin: corsOrigins,
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin || corsOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        console.warn(`⚠️ CORS rejected origin: ${origin}`);
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization","Cookie"],
+    allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
+    exposedHeaders: ["Set-Cookie"],
   })
 );
 
@@ -57,7 +69,6 @@ app.get("/api/health", (req, res) => {
 
 // ✅ API Routes
 app.use("/api/auth", authRoutes);
-console.log("✅ Auth routes mounted at /api/auth");
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/wishlist", wishlistRoutes);
