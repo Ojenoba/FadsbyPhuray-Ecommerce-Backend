@@ -7,6 +7,8 @@ import cors from "cors";
 import helmet from "helmet"; // extra security headers
 import morgan from "morgan"; // logging
 import cookieParser from "cookie-parser";
+import fs from "fs";
+import path from "path";
 
 import { connectDB } from "./config/database.js";
 import { errorHandler } from "./middleware/errorHandler.js";
@@ -61,6 +63,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use(helmet()); // secure HTTP headers
 app.use(morgan("dev")); // request logging
 app.use(cookieParser());
+
+// Ensure uploads directory exists and serve it statically
+const uploadsDir = path.join(process.cwd(), "uploads");
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+app.use("/uploads", express.static(uploadsDir));
 
 // Health check
 app.get("/api/health", (req, res) => {
