@@ -6,19 +6,13 @@ import { asyncHandler } from "../middleware/errorHandler.js";
  * POST /api/products
  */
 export const createProduct = asyncHandler(async (req, res) => {
-  // support multipart/form-data via multer: file available at req.file
-  const productData = { ...(req.body || {}) };
-  if (req.file) {
-    const base = process.env.APP_URL || "";
-    productData.image_url = `${base.replace(/\/$/, "")}/uploads/${req.file.filename}`;
-  }
-  if (productData.price) productData.price = Number(productData.price);
-  if (productData.stock_quantity) productData.stock_quantity = Number(productData.stock_quantity);
-
-  const product = new Product(productData);
+  const product = new Product(req.body);
   await product.save();
 
-  res.status(201).json({ success: true, data: product });
+  res.status(201).json({
+    success: true,
+    data: product,
+  });
 });
 
 /**
@@ -67,15 +61,7 @@ export const getProduct = asyncHandler(async (req, res) => {
  * PUT /api/products/:id
  */
 export const updateProduct = asyncHandler(async (req, res) => {
-  const productData = { ...(req.body || {}) };
-  if (req.file) {
-    const base = process.env.APP_URL || "";
-    productData.image_url = `${base.replace(/\/$/, "")}/uploads/${req.file.filename}`;
-  }
-  if (productData.price) productData.price = Number(productData.price);
-  if (productData.stock_quantity) productData.stock_quantity = Number(productData.stock_quantity);
-
-  const product = await Product.findByIdAndUpdate(req.params.id, productData, {
+  const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
   });
