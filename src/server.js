@@ -3,6 +3,9 @@ import dotenv from "dotenv";
 dotenv.config({ path: "./.env" }); // load env first
 
 import express from "express";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 import cors from "cors";
 import helmet from "helmet"; // extra security headers
 import morgan from "morgan"; // logging
@@ -61,6 +64,16 @@ app.use(express.urlencoded({ extended: true }));
 app.use(helmet()); // secure HTTP headers
 app.use(morgan("dev")); // request logging
 app.use(cookieParser());
+
+// Serve uploaded files from /uploads
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const uploadsDir = path.resolve(__dirname, "..", "..", "uploads");
+try {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+} catch (err) {
+  console.error("Failed to create uploads directory:", err);
+}
+app.use("/uploads", express.static(uploadsDir));
 
 // Health check
 app.get("/api/health", (req, res) => {

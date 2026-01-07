@@ -6,6 +6,11 @@ import { asyncHandler } from "../middleware/errorHandler.js";
  * POST /api/products
  */
 export const createProduct = asyncHandler(async (req, res) => {
+  // If files were uploaded via multer, map them to public /uploads URLs
+  if (req.files && req.files.length) {
+    req.body.images = req.files.map((f) => `/uploads/${f.filename}`);
+  }
+
   const product = new Product(req.body);
   await product.save();
 
@@ -61,6 +66,11 @@ export const getProduct = asyncHandler(async (req, res) => {
  * PUT /api/products/:id
  */
 export const updateProduct = asyncHandler(async (req, res) => {
+  // If new files were uploaded, replace `images` with uploaded file URLs
+  if (req.files && req.files.length) {
+    req.body.images = req.files.map((f) => `/uploads/${f.filename}`);
+  }
+
   const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
